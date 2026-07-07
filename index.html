@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which Creative Career Fits How You Work?</title>
+<style>
+  :root{
+    --bg:#f4f4f2;
+    --card:#ffffff;
+    --ink:#181a1f;
+    --muted:#5c6069;
+    --line:#e3e5e9;
+    --line-strong:#c9ccd3;
+    --accent:#2f5fd0;
+    --accent-soft:#2f5fd014;
+    --radius:16px;
+    --shadow:0 1px 2px rgba(24,26,31,.04), 0 8px 24px rgba(24,26,31,.06);
+    --dur:.32s;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:24px 18px 64px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .screen{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:28px 22px;
+  }
+  .screen[hidden]{display:none}
+
+  /* Motion */
+  .enter{opacity:1;transform:none}
+  @media (prefers-reduced-motion: no-preference){
+    .enter{animation:fadeUp var(--dur) cubic-bezier(.2,.7,.2,1) both}
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* Typography */
+  .eyebrow{
+    font-size:.72rem;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--accent);
+    margin:0 0 12px;
+  }
+  h1{font-size:clamp(1.55rem,5vw,2.1rem);line-height:1.15;margin:0 0 14px;letter-spacing:-.01em}
+  h2{font-size:clamp(1.35rem,4.4vw,1.75rem);line-height:1.2;margin:0 0 10px;letter-spacing:-.01em}
+  p{margin:0 0 14px;color:var(--ink)}
+  .lede{color:var(--muted);font-size:1.02rem}
+  .fine{font-size:.9rem;color:var(--muted)}
+
+  /* Buttons */
+  button{font:inherit;cursor:pointer}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--accent);color:#fff;border:1px solid var(--accent);
+    padding:13px 22px;border-radius:12px;font-weight:600;font-size:1rem;
+    transition:filter .15s ease, transform .05s ease;
+  }
+  .btn:hover{filter:brightness(1.06)}
+  .btn:active{transform:translateY(1px)}
+  .btn-ghost{
+    background:transparent;color:var(--muted);border:1px solid var(--line-strong);
+    padding:11px 18px;border-radius:12px;font-weight:600;font-size:.95rem;
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .btn-ghost:hover{background:#f0f1f3;color:var(--ink)}
+
+  /* Options */
+  .options{display:flex;flex-direction:column;gap:10px;margin:22px 0 0}
+  .option{
+    text-align:left;width:100%;
+    background:var(--card);
+    border:1px solid var(--line-strong);
+    border-radius:12px;
+    padding:15px 16px;
+    font-size:1rem;line-height:1.4;color:var(--ink);
+    display:flex;align-items:center;gap:13px;
+    transition:border-color .15s ease, background .15s ease, transform .05s ease;
+  }
+  .option:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .option:active{transform:translateY(1px)}
+  .option .marker{
+    flex:none;width:22px;height:22px;border-radius:50%;
+    border:2px solid var(--line-strong);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .option:hover .marker{border-color:var(--accent);box-shadow:inset 0 0 0 4px var(--accent-soft)}
+
+  /* Focus visibility (keyboard) */
+  :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+  .option:focus-visible{border-color:var(--accent)}
+
+  /* Progress */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
+  .qcount{font-size:.82rem;font-weight:600;color:var(--muted);letter-spacing:.02em}
+  .progress{
+    height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:22px;
+  }
+  .progress > span{
+    display:block;height:100%;width:0;background:var(--accent);border-radius:99px;
+    transition:width var(--dur) cubic-bezier(.2,.7,.2,1);
+  }
+  @media (prefers-reduced-motion: reduce){.progress > span{transition:none}}
+
+  .qfoot{margin-top:22px}
+
+  /* Result */
+  .result-head{
+    border-left:4px solid var(--accent);
+    padding-left:16px;margin-bottom:22px;
+  }
+  .result-block{margin:0 0 20px}
+  .result-block h3{
+    font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin:0 0 7px;
+  }
+  .result-block p{margin:0}
+  .honest{
+    background:var(--accent-soft);
+    border:1px solid var(--line);
+    border-radius:12px;padding:15px 16px;margin:0 0 22px;
+  }
+  .honest h3{color:var(--accent)}
+  .seealso{
+    border:1px dashed var(--line-strong);
+    border-radius:12px;padding:15px 16px;margin:0 0 26px;
+  }
+  .seealso h3{color:var(--muted)}
+  .seealso strong{color:var(--ink)}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .disclaimer{margin-top:26px;font-size:.82rem;color:var(--muted);text-align:center}
+
+  @media (max-width:360px){
+    .screen{padding:22px 16px}
+    .btn{width:100%}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- INTRO -->
+  <section class="screen" id="intro">
+    <p class="eyebrow">RMIT Vietnam &middot; Bachelor of Design (Digital Media)</p>
+    <h1>Which creative career fits how you like to work?</h1>
+    <p class="lede">Five minutes, eight questions, a starting point for thinking about your first role &mdash; not a verdict. There are no right answers and nothing is recorded. This is a reflection tool to help you notice what kind of work suits you.</p>
+    <p class="fine">Your answers stay in your browser. Nothing is sent anywhere.</p>
+    <div style="margin-top:8px">
+      <button class="btn" id="startBtn" type="button">Start</button>
+    </div>
+  </section>
+
+  <!-- QUESTION -->
+  <section class="screen" id="question" hidden>
+    <div class="topbar">
+      <span class="qcount" id="qcount">Question 1 of 8</span>
+      <button class="btn-ghost" id="backBtn" type="button">Back</button>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <h2 id="qtitle"></h2>
+    <div class="options" id="options" role="group" aria-labelledby="qtitle"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="result" hidden></section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Data ---------- */
+  var PROFILES = ["ST","AG","IN","PR","PM","FR"]; // tie-break priority order
+
+  var ACCENT = {
+    ST:"#2f5fd0", AG:"#d83a2b", IN:"#0f9d8f",
+    PR:"#b5641f", PM:"#7c3aed", FR:"#2e8b4f"
+  };
+
+  var QUESTIONS = [
+    {
+      q:"What are you most drawn to making?",
+      options:[
+        {t:"Logos, layouts, visual identities", p:{ST:2,AG:1}},
+        {t:"Campaigns and ideas that sell", p:{AG:2}},
+        {t:"Apps, websites, games people use", p:{IN:2}},
+        {t:"Photographs and filmed footage", p:{PR:2}},
+        {t:"Motion, animation, edited sequences", p:{PM:2}}
+      ]
+    },
+    {
+      q:"Where in a project do you come alive?",
+      options:[
+        {t:"Concepting and shaping the idea", p:{AG:2,ST:1}},
+        {t:"Refining a design system until it's right", p:{ST:2,IN:1}},
+        {t:"On location, capturing the material", p:{PR:2}},
+        {t:"Afterwards, assembling raw material into the final piece", p:{PM:2}},
+        {t:"Testing with users and improving version by version", p:{IN:2}}
+      ]
+    },
+    {
+      q:"Which working rhythm suits you?",
+      options:[
+        {t:"New client, new brief, new problem every few weeks", p:{AG:2,ST:1}},
+        {t:"One product I keep making better over years", p:{IN:2}},
+        {t:"Project-based: intense builds, then on to the next job", p:{PR:2,PM:1}},
+        {t:"I choose which briefs to take at all", p:{FR:2}}
+      ]
+    },
+    {
+      q:"Your ideal workplace is…",
+      options:[
+        {t:"A design studio with a tight creative team", p:{ST:2}},
+        {t:"A buzzing agency floor", p:{AG:2}},
+        {t:"A tech office or start-up space", p:{IN:2}},
+        {t:"A film set or on location", p:{PR:2}},
+        {t:"An edit suite or workstation with headphones on", p:{PM:2}},
+        {t:"Backstage at a live event, running visuals", p:{PM:2,FR:1}},
+        {t:"Wherever I open my laptop", p:{FR:2}}
+      ]
+    },
+    {
+      q:"How do you like to work with others?",
+      options:[
+        {t:"Small team, everyone does a bit of everything", p:{ST:2,FR:1}},
+        {t:"Big team with specialists — planners, copywriters, account people", p:{AG:2}},
+        {t:"Cross-functional squad: developers, PMs, designers", p:{IN:2}},
+        {t:"A crew where everyone has an exact on-set role", p:{PR:2}},
+        {t:"Mostly alone at my station, syncing at reviews", p:{PM:2,FR:1}}
+      ]
+    },
+    {
+      q:"Which deadline pressure can you live with?",
+      options:[
+        {t:"Pitch weeks and campaign launches", p:{AG:2}},
+        {t:"Client presentation deadlines", p:{ST:2}},
+        {t:"Shoot days — everything must work on the day", p:{PR:2}},
+        {t:"Render and delivery deadlines, late nights before final export", p:{PM:2}},
+        {t:"Release cycles and sprint reviews", p:{IN:2}}
+      ]
+    },
+    {
+      q:"In five years, the thing you show off is…",
+      options:[
+        {t:"A brand identity used across a whole company", p:{ST:2}},
+        {t:"A campaign everyone in Vietnam saw", p:{AG:2}},
+        {t:"An app or game with real users", p:{IN:2}},
+        {t:"A commercial or film I shot", p:{PR:2}},
+        {t:"A showreel of motion work and edits", p:{PM:2}},
+        {t:"A 3D world or characters I built", p:{PM:2,IN:1}},
+        {t:"A client list I built myself", p:{FR:2}}
+      ]
+    },
+    {
+      q:"How do you feel about running your own show?",
+      options:[
+        {t:"I want a team, a boss, and a salary while I learn", p:{}},
+        {t:"Eventually my own clients, after I've learned the ropes", p:{FR:2}},
+        {t:"I'd rather be the reliable specialist than the business owner", p:{PM:1,PR:1}},
+        {t:"I want to climb: junior → senior → creative director", p:{AG:1,ST:1}}
+      ]
+    }
+  ];
+
+  var RESULTS = {
+    ST:{
+      name:"Studio Designer",
+      desc:"You like shaping how things look and refining until it's right. Studio work means a small, close creative team, direct client contact, and craft-driven projects — identities, publications, packaging, communication design.",
+      roles:"Graphic designer, brand designer, communication designer, art director (later).",
+      where:"Independent design and branding studios, communication design studios.",
+      first:"Junior designer in a studio. Small teams mean you learn fast and your work is visible — and so are your mistakes. A tight, well-crafted portfolio matters more here than anywhere else."
+    },
+    AG:{
+      name:"Agency Creative",
+      desc:"You're driven by ideas and variety. Agency life means many clients, fast campaigns, pitch pressure, and big collaborative teams with specialists — planners, copywriters, account people.",
+      roles:"Designer, art director track, copywriter (if words are your thing), later creative director.",
+      where:"Advertising agencies and digital agencies — international networks and local independents.",
+      first:"Junior designer or intern on a creative team. Expect intensity around pitches and launches. The trade: fastest portfolio growth and widest exposure of any path."
+    },
+    IN:{
+      name:"Interactive Designer",
+      desc:"You care about how things work, not just how they look. Interactive work means designing apps, websites and games, improving one product over time, and working in cross-functional teams with developers.",
+      roles:"UX/UI designer, product design track, game designer. If your interest is the art side of games — modelling, environments, characters — see also the Motion, Animation & 3D path: game studios hire both.",
+      where:"Tech companies, start-ups, in-house digital teams, game studios.",
+      first:"UX/UI internships and junior roles are the widest entry door in Vietnam's market right now. Case studies showing your thinking beat pretty screens."
+    },
+    PR:{
+      name:"Production Creative",
+      desc:"You want to be where things are captured, not behind a desk. Production work means shoots, locations, crews with exact roles, and days where everything has to work on the day.",
+      roles:"Photographer, cinematographer, camera assistant, and the wider set of production-house roles — producer track, art department, lighting.",
+      where:"Production houses, entertainment companies, commercial photo studios.",
+      first:"Almost everyone starts as a production assistant or camera assistant, not as the photographer or DP. It's crew-based work — reliability on set builds your reputation before your reel does."
+    },
+    PM:{
+      name:"Motion, Animation & 3D Artist",
+      desc:"You disappear into the craft: frames, timing, detail, and the moment raw material becomes a finished piece. This path means workstations, render deadlines, and a showreel that speaks for you.",
+      roles:"Motion designer, 2D animator, 3D animator, 3D artist (including for game studios), VFX artist, video editor, sound designer, VJ — live visuals for events, usually freelance work built on top of motion skills.",
+      where:"Post-production companies, animation and VFX studios, game studios (art teams), production houses with post departments.",
+      first:"Junior editor, junior motion designer, or roto/compositing roles. Your showreel is your CV — one great 60-second reel beats ten average projects."
+    },
+    FR:{
+      name:"Freelancer",
+      desc:"You want to choose your projects, your clients, and your hours — and you're willing to run a business to get that: finding work, quoting, invoicing, chasing payment.",
+      roles:"Freelance design, motion, photography, or live visuals (VJ work is almost entirely gig-based).",
+      where:"Your own network — freelancing runs on relationships and referrals.",
+      first:"Very few designers freelance successfully straight out of university. The proven route is 2–3 years employed — building skills, a network, and savings — then going independent. Treat this result as a direction to build toward, and look at your second-highest match (shown below) for where to start."
+    }
+  };
+
+  /* ---------- State ---------- */
+  var qIndex = 0;
+  var selections = [];               // optionIndex chosen per question
+  var scores = {ST:0,AG:0,IN:0,PR:0,PM:0,FR:0};
+
+  var el = {
+    intro:document.getElementById("intro"),
+    question:document.getElementById("question"),
+    result:document.getElementById("result"),
+    startBtn:document.getElementById("startBtn"),
+    backBtn:document.getElementById("backBtn"),
+    qcount:document.getElementById("qcount"),
+    qtitle:document.getElementById("qtitle"),
+    options:document.getElementById("options"),
+    progressBar:document.getElementById("progressBar")
+  };
+
+  /* ---------- Scoring helpers ---------- */
+  function applyPoints(p, sign){
+    for(var k in p){ if(p.hasOwnProperty(k)){ scores[k] += sign * p[k]; } }
+  }
+
+  function setAccent(key){
+    var c = ACCENT[key] || "#2f5fd0";
+    document.documentElement.style.setProperty("--accent", c);
+    document.documentElement.style.setProperty("--accent-soft", c + "14");
+  }
+
+  function replay(node){ // re-trigger enter animation
+    node.classList.remove("enter");
+    void node.offsetWidth;
+    node.classList.add("enter");
+  }
+
+  /* ---------- Screen switching ---------- */
+  function show(which){
+    el.intro.hidden = which !== "intro";
+    el.question.hidden = which !== "question";
+    el.result.hidden = which !== "result";
+  }
+
+  function showIntro(){
+    setAccent("ST"); // neutral brand blue on intro
+    show("intro");
+    replay(el.intro);
+    el.startBtn.focus();
+  }
+
+  function renderQuestion(){
+    setAccent("ST");
+    var item = QUESTIONS[qIndex];
+    el.qcount.textContent = "Question " + (qIndex+1) + " of " + QUESTIONS.length;
+    el.qtitle.textContent = item.q;
+    el.progressBar.style.width = ((qIndex) / QUESTIONS.length * 100) + "%";
+
+    el.options.innerHTML = "";
+    item.options.forEach(function(opt, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "option";
+      b.setAttribute("data-i", i);
+      var marker = document.createElement("span");
+      marker.className = "marker";
+      marker.setAttribute("aria-hidden","true");
+      var label = document.createElement("span");
+      label.textContent = opt.t;
+      b.appendChild(marker);
+      b.appendChild(label);
+      b.addEventListener("click", function(){ selectOption(i); });
+      el.options.appendChild(b);
+    });
+
+    show("question");
+    replay(el.question);
+    // Focus first option for keyboard users
+    var first = el.options.querySelector(".option");
+    if(first){ first.focus(); }
+  }
+
+  function selectOption(i){
+    selections[qIndex] = i;
+    applyPoints(QUESTIONS[qIndex].options[i].p, +1);
+    qIndex++;
+    if(qIndex >= QUESTIONS.length){
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function goBack(){
+    if(qIndex === 0){
+      showIntro();
+      return;
+    }
+    qIndex--;
+    // Reverse the points from the answer previously given to this question.
+    var prev = selections[qIndex];
+    if(prev !== null && prev !== undefined){
+      applyPoints(QUESTIONS[qIndex].options[prev].p, -1);
+      selections[qIndex] = null;
+    }
+    renderQuestion();
+  }
+
+  /* ---------- Ranking ---------- */
+  function ranked(){
+    // Sort by score desc, then by priority order (index in PROFILES) asc.
+    return PROFILES.slice().sort(function(a,b){
+      if(scores[b] !== scores[a]) return scores[b] - scores[a];
+      return PROFILES.indexOf(a) - PROFILES.indexOf(b);
+    });
+  }
+
+  function showResult(){
+    el.progressBar.style.width = "100%";
+    var order = ranked();
+    var winner = order[0];
+    var runner = order[1];
+    setAccent(winner);
+
+    var W = RESULTS[winner];
+    var R = RESULTS[runner];
+
+    var html = ''
+      + '<p class="eyebrow">Your closest match</p>'
+      + '<div class="result-head">'
+      +   '<h2>' + esc(W.name) + '</h2>'
+      +   '<p class="lede" style="margin:0">' + esc(W.desc) + '</p>'
+      + '</div>'
+      + block("Roles this includes", W.roles)
+      + block("Where to look in Vietnam", W.where)
+      + '<div class="honest">'
+      +   '<h3>First step, honestly</h3>'
+      +   '<p>' + esc(W.first) + '</p>'
+      + '</div>'
+      + '<div class="seealso">'
+      +   '<h3>See also</h3>'
+      +   '<p>Your second-highest match is <strong>' + esc(R.name) + '</strong>. '
+      +      esc(shortDesc(R.desc)) + '</p>'
+      + '</div>'
+      + '<div class="actions">'
+      +   '<button class="btn" id="restartBtn" type="button">Start over</button>'
+      +   '<button class="btn-ghost" id="reviewBtn" type="button">Back to last question</button>'
+      + '</div>'
+      + '<p class="disclaimer">A starting point for thinking, not a verdict. Nothing here was saved or sent anywhere.</p>';
+
+    el.result.innerHTML = html;
+    show("result");
+    replay(el.result);
+
+    document.getElementById("restartBtn").addEventListener("click", restart);
+    document.getElementById("restartBtn").focus();
+    document.getElementById("reviewBtn").addEventListener("click", function(){
+      // Return to Q8 and undo its points so it can be re-answered.
+      goBack();
+    });
+  }
+
+  function block(title, body){
+    return '<div class="result-block"><h3>' + esc(title) + '</h3><p>' + esc(body) + '</p></div>';
+  }
+
+  function shortDesc(desc){
+    // First sentence of the runner-up description, for a lighter touch.
+    var m = desc.split(". ");
+    return m[0].replace(/\.$/, "") + ".";
+  }
+
+  function esc(s){
+    return String(s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function restart(){
+    qIndex = 0;
+    selections = [];
+    scores = {ST:0,AG:0,IN:0,PR:0,PM:0,FR:0};
+    showIntro();
+  }
+
+  /* ---------- Wire up ---------- */
+  el.startBtn.addEventListener("click", function(){ qIndex = 0; renderQuestion(); });
+  el.backBtn.addEventListener("click", goBack);
+
+  showIntro();
+})();
+</script>
+</body>
+</html>
