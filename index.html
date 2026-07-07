@@ -6,17 +6,21 @@
 <title>Which Creative Career Fits How You Work?</title>
 <style>
   :root{
-    --bg:#f4f4f2;
-    --card:#ffffff;
-    --ink:#181a1f;
-    --muted:#5c6069;
-    --line:#e3e5e9;
-    --line-strong:#c9ccd3;
-    --accent:#e60028;
-    --accent-soft:#e6002814;
+    --bg:#FFFDF7;
+    --ink:#16181D;
+    --muted:#5C616B;
+    --neutral:#F0E9DC;
+    --card:#FFFFFF;
+    --accent:#D85A30;          /* coral — fixed UI accent (progress, eyebrow, focus) */
+    --accent-tint:#FBE9E1;
     --radius:16px;
-    --shadow:0 1px 2px rgba(24,26,31,.04), 0 8px 24px rgba(24,26,31,.06);
-    --dur:.32s;
+    --dur:.18s;
+
+    /* result screen — overridden inline by JS per winning archetype */
+    --win-solid:#D85A30;   /* solid archetype colour: bars, shapes, badges (backgrounds) */
+    --win-name:#D85A30;    /* readable name-text colour (ink where the solid would fail contrast) */
+    --win-tint:#FBE9E1;
+    --run-tint:#EDEBFB;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -29,28 +33,35 @@
     text-rendering:optimizeLegibility;
   }
   .wrap{
-    max-width:720px;
+    max-width:660px;
     margin:0 auto;
-    padding:24px 18px 64px;
+    padding:32px 18px 64px;
     min-height:100vh;
     display:flex;
     flex-direction:column;
   }
   .screen{
+    position:relative;
     background:var(--card);
-    border:1px solid var(--line);
+    border:2px solid var(--ink);
     border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:28px 22px;
+    box-shadow:0 10px 30px rgba(22,24,29,.06);
+    padding:34px 28px;
   }
   .screen[hidden]{display:none}
+  .screen.deco-on{overflow:hidden}
+
+  /* Decorative flat shapes (intro + result only, in corners, never behind text) */
+  .deco{position:absolute;inset:0;z-index:0;pointer-events:none}
+  .deco b{position:absolute;display:block}
+  .screen > :not(.deco){position:relative;z-index:1}
 
   /* Motion */
   .enter{opacity:1;transform:none}
   @media (prefers-reduced-motion: no-preference){
     .enter{animation:fadeUp var(--dur) cubic-bezier(.2,.7,.2,1) both}
   }
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
   /* Typography */
   .eyebrow{
@@ -59,11 +70,11 @@
     text-transform:uppercase;
     font-weight:700;
     color:var(--accent);
-    margin:0 0 12px;
+    margin:0 0 14px;
   }
-  h1{font-size:clamp(1.55rem,5vw,2.1rem);line-height:1.15;margin:0 0 14px;letter-spacing:-.01em}
-  h2{font-size:clamp(1.35rem,4.4vw,1.75rem);line-height:1.2;margin:0 0 10px;letter-spacing:-.01em}
-  p{margin:0 0 14px;color:var(--ink)}
+  h1{font-size:clamp(1.7rem,6vw,2.15rem);line-height:1.12;margin:0 0 16px;font-weight:700;letter-spacing:-.015em}
+  h2{font-size:clamp(1.2rem,4.4vw,1.4rem);line-height:1.25;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+  p{margin:0 0 14px}
   .lede{color:var(--muted);font-size:1.02rem}
   .fine{font-size:.9rem;color:var(--muted)}
 
@@ -71,87 +82,81 @@
   button{font:inherit;cursor:pointer}
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    background:var(--accent);color:#fff;border:1px solid var(--accent);
-    padding:13px 22px;border-radius:12px;font-weight:600;font-size:1rem;
-    transition:filter .15s ease, transform .05s ease;
+    background:var(--ink);color:var(--bg);border:2px solid var(--ink);
+    padding:14px 26px;border-radius:999px;font-weight:600;font-size:1rem;
+    transition:transform var(--dur) ease, background var(--dur) ease;
   }
-  .btn:hover{filter:brightness(1.06)}
-  .btn:active{transform:translateY(1px)}
+  .btn:hover{transform:translateY(-2px);background:#000}
+  .btn:active{transform:translateY(0)}
   .btn-ghost{
-    background:transparent;color:var(--muted);border:1px solid var(--line-strong);
-    padding:11px 18px;border-radius:12px;font-weight:600;font-size:.95rem;
-    transition:background .15s ease,color .15s ease,border-color .15s ease;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;color:var(--ink);border:2px solid var(--ink);
+    padding:12px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+    transition:background var(--dur) ease,color var(--dur) ease;
   }
-  .btn-ghost:hover{background:#f0f1f3;color:var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--bg)}
 
-  /* Options */
-  .options{display:flex;flex-direction:column;gap:10px;margin:22px 0 0}
+  /* Options — decorative pale tints assigned by position, not by outcome */
+  .options{display:flex;flex-direction:column;gap:12px;margin:24px 0 0}
   .option{
-    text-align:left;width:100%;
-    background:var(--card);
-    border:1px solid var(--line-strong);
+    text-align:left;width:100%;min-height:52px;
+    background:var(--accent-tint);            /* overridden inline per position */
+    border:2px solid var(--ink);
     border-radius:12px;
-    padding:15px 16px;
-    font-size:1rem;line-height:1.4;color:var(--ink);
-    display:flex;align-items:center;gap:13px;
-    transition:border-color .15s ease, background .15s ease, transform .05s ease;
+    padding:15px 18px;
+    font-size:1rem;line-height:1.4;color:var(--ink);font-weight:500;
+    transition:transform var(--dur) ease, filter var(--dur) ease;
   }
-  .option:hover{border-color:var(--accent);background:var(--accent-soft)}
-  .option:active{transform:translateY(1px)}
-  .option .marker{
-    flex:none;width:22px;height:22px;border-radius:50%;
-    border:2px solid var(--line-strong);
-    transition:border-color .15s ease, box-shadow .15s ease;
-  }
-  .option:hover .marker{border-color:var(--accent);box-shadow:inset 0 0 0 4px var(--accent-soft)}
+  .option:hover{transform:translateY(-2px);filter:brightness(.96)}
+  .option:active{transform:translateY(0);filter:brightness(.92)}
 
   /* Focus visibility (keyboard) */
-  :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
-  .option:focus-visible{border-color:var(--accent)}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  .btn:focus-visible,.btn-ghost:focus-visible{outline-color:var(--ink)}
 
-  /* Progress */
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
+  /* Progress — 8 equal rounded segments */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
   .qcount{font-size:.82rem;font-weight:600;color:var(--muted);letter-spacing:.02em}
-  .progress{
-    height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:22px;
-  }
-  .progress > span{
-    display:block;height:100%;width:0;background:var(--accent);border-radius:99px;
-    transition:width var(--dur) cubic-bezier(.2,.7,.2,1);
-  }
-  @media (prefers-reduced-motion: reduce){.progress > span{transition:none}}
-
-  .qfoot{margin-top:22px}
+  .progress{display:flex;gap:6px;margin-bottom:24px}
+  .progress b{flex:1;height:8px;border-radius:99px;background:var(--neutral);transition:background var(--dur) ease}
+  .progress b.on{background:var(--accent)}
 
   /* Result */
-  .result-head{
-    border-left:4px solid var(--accent);
-    padding-left:16px;margin-bottom:22px;
+  .result-name{
+    font-size:clamp(1.8rem,6vw,2.35rem);line-height:1.1;font-weight:700;
+    letter-spacing:-.02em;color:var(--win-name);margin:0 0 12px;
   }
-  .result-block{margin:0 0 20px}
-  .result-block h3{
-    font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--muted);font-weight:700;margin:0 0 7px;
+  .result-bar{width:64px;height:6px;border-radius:99px;background:var(--win-solid);margin:0 0 18px}
+  .result-desc{color:var(--muted);font-size:1.02rem;margin:0 0 22px}
+  .panel{
+    background:var(--win-tint);border:2px solid var(--ink);
+    border-radius:12px;padding:16px 18px;margin:0 0 14px;
   }
-  .result-block p{margin:0}
   .honest{
-    background:var(--accent-soft);
-    border:1px solid var(--line);
-    border-radius:12px;padding:15px 16px;margin:0 0 22px;
+    background:var(--neutral);border:2px solid var(--ink);
+    border-radius:12px;padding:16px 18px;margin:18px 0;
   }
-  .honest h3{color:var(--accent)}
   .seealso{
-    border:1px dashed var(--line-strong);
-    border-radius:12px;padding:15px 16px;margin:0 0 26px;
+    background:var(--run-tint);border:2px solid var(--ink);
+    border-radius:12px;padding:16px 18px;margin:0 0 24px;
   }
-  .seealso h3{color:var(--muted)}
+  .panel h3,.honest h3,.seealso h3{
+    font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;margin:0 0 6px;color:var(--ink);
+  }
+  .panel p,.honest p,.seealso p{margin:0;color:var(--ink)}
   .seealso strong{color:var(--ink)}
   .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-  .disclaimer{margin-top:26px;font-size:.82rem;color:var(--muted);text-align:center}
+  .disclaimer{margin-top:24px;font-size:.82rem;color:var(--muted);text-align:center}
 
-  @media (max-width:360px){
-    .screen{padding:22px 16px}
+  @media (prefers-reduced-motion: reduce){
+    .option,.btn,.btn-ghost,.progress b{transition:none}
+    .option:hover,.btn:hover{transform:none}
+  }
+  @media (max-width:400px){
+    .screen{padding:26px 18px}
     .btn{width:100%}
+    .actions .btn{width:100%}
   }
 </style>
 </head>
@@ -159,13 +164,17 @@
 <main class="wrap">
 
   <!-- INTRO -->
-  <section class="screen" id="intro">
+  <section class="screen deco-on" id="intro">
+    <div class="deco" aria-hidden="true">
+      <b style="top:-34px;right:-26px;width:112px;height:112px;border-radius:50%;background:#F5C445"></b>
+      <b style="bottom:-30px;left:-28px;width:92px;height:92px;border-radius:26px;transform:rotate(18deg);background:#7F77DD"></b>
+    </div>
     <p class="eyebrow">Digital Media &middot; Professional Practice</p>
     <h1>Which creative career fits how you like to work?</h1>
     <p class="lede">Five minutes, eight questions, a starting point for thinking about your first role &mdash; not a verdict. There are no right answers and nothing is recorded. This is a reflection tool to help you notice what kind of work suits you.</p>
     <p class="fine">Your answers stay in your browser. Nothing is sent anywhere.</p>
     <div style="margin-top:8px">
-      <button class="btn" id="startBtn" type="button">Start</button>
+      <button class="btn" id="startBtn" type="button">Let's go</button>
     </div>
   </section>
 
@@ -175,13 +184,13 @@
       <span class="qcount" id="qcount">Question 1 of 8</span>
       <button class="btn-ghost" id="backBtn" type="button">Back</button>
     </div>
-    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <div class="progress" id="progress" aria-hidden="true"></div>
     <h2 id="qtitle"></h2>
     <div class="options" id="options" role="group" aria-labelledby="qtitle"></div>
   </section>
 
   <!-- RESULT -->
-  <section class="screen" id="result" hidden></section>
+  <section class="screen deco-on" id="result" hidden></section>
 
 </main>
 
@@ -192,10 +201,23 @@
   /* ---------- Data ---------- */
   var PROFILES = ["ST","AG","IN","PR","PM","FR"]; // tie-break priority order
 
-  var ACCENT = {
-    ST:"#e60028", AG:"#d83a2b", IN:"#0f9d8f",
-    PR:"#b5641f", PM:"#7c3aed", FR:"#2e8b4f"
+  // Archetype colours — meaningful only on the result screen.
+  var SOLID = {
+    ST:"#D85A30", AG:"#F5C445", IN:"#7F77DD",
+    PR:"#1D9E75", PM:"#D4537E", FR:"#16181D"
   };
+  var TINT = {
+    ST:"#FBE9E1", AG:"#FDF3D7", IN:"#EDEBFB",
+    PR:"#E5F5EE", PM:"#FBE9F0", FR:"#F0EFEA"
+  };
+  // Name-text colours: same as SOLID, except yellow (AG) drops to ink — yellow text
+  // never has enough contrast, so its colour identity is carried by the solid bar instead.
+  var NAME = {
+    ST:"#D85A30", AG:"#16181D", IN:"#7F77DD",
+    PR:"#1D9E75", PM:"#D4537E", FR:"#16181D"
+  };
+  // Decorative option backgrounds, rotated by position — NOT mapped to outcome.
+  var OPTION_TINTS = ["#FBE9E1","#FDF3D7","#EDEBFB","#E5F5EE","#FBE9F0"];
 
   var QUESTIONS = [
     {
@@ -341,7 +363,7 @@
     qcount:document.getElementById("qcount"),
     qtitle:document.getElementById("qtitle"),
     options:document.getElementById("options"),
-    progressBar:document.getElementById("progressBar")
+    progress:document.getElementById("progress")
   };
 
   /* ---------- Scoring helpers ---------- */
@@ -349,16 +371,30 @@
     for(var k in p){ if(p.hasOwnProperty(k)){ scores[k] += sign * p[k]; } }
   }
 
-  function setAccent(key){
-    var c = ACCENT[key] || "#e60028";
-    document.documentElement.style.setProperty("--accent", c);
-    document.documentElement.style.setProperty("--accent-soft", c + "14");
+  function setResultColors(winner, runner){
+    var s = document.documentElement.style;
+    s.setProperty("--win-solid", SOLID[winner] || "#D85A30");
+    s.setProperty("--win-name",  NAME[winner]  || "#D85A30");
+    s.setProperty("--win-tint",  TINT[winner]  || "#FBE9E1");
+    s.setProperty("--run-tint",  TINT[runner]  || "#EDEBFB");
   }
 
   function replay(node){ // re-trigger enter animation
     node.classList.remove("enter");
     void node.offsetWidth;
     node.classList.add("enter");
+  }
+
+  /* ---------- Progress (8 rounded segments) ---------- */
+  function buildProgress(){
+    el.progress.innerHTML = "";
+    for(var i=0;i<QUESTIONS.length;i++){
+      el.progress.appendChild(document.createElement("b"));
+    }
+  }
+  function setProgress(n){
+    var segs = el.progress.children;
+    for(var i=0;i<segs.length;i++){ segs[i].className = i < n ? "on" : ""; }
   }
 
   /* ---------- Screen switching ---------- */
@@ -369,32 +405,25 @@
   }
 
   function showIntro(){
-    setAccent("ST"); // neutral RMIT red on intro
     show("intro");
     replay(el.intro);
     el.startBtn.focus();
   }
 
   function renderQuestion(){
-    setAccent("ST");
     var item = QUESTIONS[qIndex];
     el.qcount.textContent = "Question " + (qIndex+1) + " of " + QUESTIONS.length;
     el.qtitle.textContent = item.q;
-    el.progressBar.style.width = ((qIndex) / QUESTIONS.length * 100) + "%";
+    setProgress(qIndex);
 
     el.options.innerHTML = "";
     item.options.forEach(function(opt, i){
       var b = document.createElement("button");
       b.type = "button";
       b.className = "option";
-      b.setAttribute("data-i", i);
-      var marker = document.createElement("span");
-      marker.className = "marker";
-      marker.setAttribute("aria-hidden","true");
-      var label = document.createElement("span");
-      label.textContent = opt.t;
-      b.appendChild(marker);
-      b.appendChild(label);
+      // Decorative tint by position only — never mapped to the scored profile.
+      b.style.background = OPTION_TINTS[i % OPTION_TINTS.length];
+      b.textContent = opt.t;
       b.addEventListener("click", function(){ selectOption(i); });
       el.options.appendChild(b);
     });
@@ -442,23 +471,26 @@
   }
 
   function showResult(){
-    el.progressBar.style.width = "100%";
+    setProgress(QUESTIONS.length);
     var order = ranked();
     var winner = order[0];
     var runner = order[1];
-    setAccent(winner);
+    setResultColors(winner, runner);
 
     var W = RESULTS[winner];
     var R = RESULTS[runner];
 
     var html = ''
-      + '<p class="eyebrow">Your closest match</p>'
-      + '<div class="result-head">'
-      +   '<h2>' + esc(W.name) + '</h2>'
-      +   '<p class="lede" style="margin:0">' + esc(W.desc) + '</p>'
+      + '<div class="deco" aria-hidden="true">'
+      +   '<b style="top:-32px;right:-28px;width:110px;height:110px;border-radius:50%;background:var(--win-solid);opacity:.16"></b>'
+      +   '<b style="bottom:-26px;left:-24px;width:88px;height:88px;border-radius:24px;transform:rotate(-16deg);background:var(--win-solid);opacity:.10"></b>'
       + '</div>'
-      + block("Roles this includes", W.roles)
-      + block("Where to look in Vietnam", W.where)
+      + '<p class="eyebrow">Your result</p>'
+      + '<h2 class="result-name">' + esc(W.name) + '</h2>'
+      + '<div class="result-bar"></div>'
+      + '<p class="result-desc">' + esc(W.desc) + '</p>'
+      + '<div class="panel"><h3>Roles this includes</h3><p>' + esc(W.roles) + '</p></div>'
+      + '<div class="panel"><h3>Where to look in Vietnam</h3><p>' + esc(W.where) + '</p></div>'
       + '<div class="honest">'
       +   '<h3>First step, honestly</h3>'
       +   '<p>' + esc(W.first) + '</p>'
@@ -486,10 +518,6 @@
     });
   }
 
-  function block(title, body){
-    return '<div class="result-block"><h3>' + esc(title) + '</h3><p>' + esc(body) + '</p></div>';
-  }
-
   function shortDesc(desc){
     // First sentence of the runner-up description, for a lighter touch.
     var m = desc.split(". ");
@@ -509,6 +537,7 @@
   }
 
   /* ---------- Wire up ---------- */
+  buildProgress();
   el.startBtn.addEventListener("click", function(){ qIndex = 0; renderQuestion(); });
   el.backBtn.addEventListener("click", goBack);
 
