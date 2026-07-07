@@ -12,8 +12,8 @@
     --muted:#5c6069;
     --line:#e3e5e9;
     --line-strong:#c9ccd3;
-    --accent:#2f5fd0;
-    --accent-soft:#2f5fd014;
+    --accent:#e60028;
+    --accent-soft:#e6002814;
     --radius:16px;
     --shadow:0 1px 2px rgba(24,26,31,.04), 0 8px 24px rgba(24,26,31,.06);
     --dur:.32s;
@@ -160,7 +160,7 @@
 
   <!-- INTRO -->
   <section class="screen" id="intro">
-    <p class="eyebrow">RMIT Vietnam &middot; Bachelor of Design (Digital Media)</p>
+    <p class="eyebrow">Digital Media &middot; Professional Practice</p>
     <h1>Which creative career fits how you like to work?</h1>
     <p class="lede">Five minutes, eight questions, a starting point for thinking about your first role &mdash; not a verdict. There are no right answers and nothing is recorded. This is a reflection tool to help you notice what kind of work suits you.</p>
     <p class="fine">Your answers stay in your browser. Nothing is sent anywhere.</p>
@@ -193,7 +193,7 @@
   var PROFILES = ["ST","AG","IN","PR","PM","FR"]; // tie-break priority order
 
   var ACCENT = {
-    ST:"#2f5fd0", AG:"#d83a2b", IN:"#0f9d8f",
+    ST:"#e60028", AG:"#d83a2b", IN:"#0f9d8f",
     PR:"#b5641f", PM:"#7c3aed", FR:"#2e8b4f"
   };
 
@@ -350,7 +350,7 @@
   }
 
   function setAccent(key){
-    var c = ACCENT[key] || "#2f5fd0";
+    var c = ACCENT[key] || "#e60028";
     document.documentElement.style.setProperty("--accent", c);
     document.documentElement.style.setProperty("--accent-soft", c + "14");
   }
@@ -369,7 +369,7 @@
   }
 
   function showIntro(){
-    setAccent("ST"); // neutral brand blue on intro
+    setAccent("ST"); // neutral RMIT red on intro
     show("intro");
     replay(el.intro);
     el.startBtn.focus();
