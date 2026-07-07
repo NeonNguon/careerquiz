@@ -8,6 +8,8 @@ no right answers.
 Six archetypes: Studio Designer, Agency Creative, Interactive Designer, Production
 Creative, Motion/Animation & 3D Artist, and Freelancer.
 
+**Live:** https://neonnguon.github.io/careerquiz/
+
 ## Privacy
 
 The quiz collects **nothing**. No cookies, no `localStorage`, no network requests,
@@ -40,15 +42,14 @@ Replace `USERNAME` with your GitHub username and `REPO` with the repository name
 
 ## Embed in RMIT Canvas
 
-Add this snippet to a Canvas page (edit the page → HTML editor), replacing
-`USERNAME` and `REPO`:
+Add this snippet to a Canvas page (edit the page → HTML editor):
 
 ```html
-<iframe src="https://USERNAME.github.io/REPO/" width="100%" height="700" style="border:1px solid #e3e5e9;border-radius:12px;"></iframe>
+<iframe src="https://neonnguon.github.io/careerquiz/" width="100%" height="700" style="border:1px solid #e3e5e9;border-radius:12px;"></iframe>
 ```
 
 If Canvas strips the `<iframe>`, ask your Canvas admin to allow the
-`USERNAME.github.io` domain, or use Canvas's **External URL** / Redirect tool to
+`neonnguon.github.io` domain, or use Canvas's **External URL** / Redirect tool to
 link out to the quiz instead.
 
 ## Editing content
